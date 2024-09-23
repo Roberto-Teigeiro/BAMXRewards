@@ -5,7 +5,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from '~/components/ui/card';
+} from '@/components/ui/CustomCard';
 import { Text } from './ui/text';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Link } from 'expo-router';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View, AppState, Button, Image } from 'react-native'
+import {TextInput , ScrollView } from 'react-native';
 import { supabase } from '@/utils/supabase'
 import { Input } from './ui/input'
 import { useSession } from '@/context'
@@ -24,6 +25,7 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showregister, setshowregister] = useState(false)
 
   async function signInWithEmail() {
     setLoading(true)
@@ -53,50 +55,130 @@ export default function Auth() {
     if (!session) Alert.alert('Please check your inbox for email verification!')
     setLoading(false)
   }
-
+if (!showregister){
   return (
-    <ParallaxScrollView 
-    headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={{ height: 178, width: 290, bottom: 0, left: 0,  position: 'absolute'}}
+    <ScrollView style={styles.container}>
+      <Image
+        source={require('@/assets/images/favicon-scaled.png')} // Update this path to where your actual logo is stored
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Bienvenido de Nuevo</Text>
+      <Text style={styles.subtitle}>Inicia Sesión</Text>
+      
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Escribe tu correo electrónico"
+          onChangeText={setEmail}
+          value={email}
+          autoCapitalize="none"
         />
-    }>
-    <View className='h-screen'>
-      <View className='container gap-2'>
-        <View >
-          <Text>Email</Text>
-          <Input
-            placeholder="Email"
-            //   leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            //   placeholder="email@address.com"
-            autoCapitalize={'none'}
-          />
-        </View>
-        <View >
-          <Text>Password</Text>
-          <Input
-            placeholder="Password"
-            //   leftIcon={{ type: 'font-awesome', name: 'lock' }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            //   placeholder="Password"
-            autoCapitalize={'none'}
-          />
-        </View>
-        <View >
-          <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
-        </View>
-        <View >
-          <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
-        </View>
-
+        <TextInput
+          style={styles.input}
+          placeholder="Escribe tu contraseña"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={true}
+          autoCapitalize="none"
+        />
+        <Button title="Iniciar Sesión" disabled={loading} onPress={signInWithEmail} color="#FF5858" />
+        <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
       </View>
-    </View>
-    </ParallaxScrollView>
+      
+      <Text style={styles.orText}>O usa una de tus redes</Text>
+      
+      <Button title="Google" disabled={loading} onPress={() => {Alert.alert("Work in progress")}} color="#DB4437" />
+      <Button title="Facebook" disabled={loading} onPress={() => {Alert.alert("Work in progress")}} color="#4267B2" />
+
+      <Text style={styles.signupPrompt}>
+        ¿No tienes una cuenta? <Text style={styles.signupLink} onPress={() => setshowregister(prev => !prev)}        >Regístrate gratis</Text>
+      </Text>
+    </ScrollView>
+  );
+}
+
+if(showregister){
+  return(
+    <ScrollView style={styles.container}>
+       <Image
+        source={require('@/assets/images/favicon-scaled.png')}
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Registrate</Text>
+       <TextInput
+          style={styles.input}
+          placeholder="Escribe tu correo electrónico"
+          onChangeText={setEmail}
+          value={email}
+          autoCapitalize="none"
+        />
+      <TextInput
+          style={styles.input}
+          placeholder="Escribe tu contraseña"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={true}
+          autoCapitalize="none"
+        />
+       <Button title="Registrarme" disabled={loading} onPress={signUpWithEmail} color="#FF5858" />
+       <Text style={styles.signupPrompt}>
+        ¿Ya tienes cuenta? <Text style={styles.signupLink} onPress={() => setshowregister(prev => !prev)}        >Entra con tu email</Text>
+      </Text>
+      </ScrollView>
   )
 }
+}
+;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff'
+  },
+  logo: {
+    height: 110,
+    width: 120,
+    alignSelf: 'center',
+    margin: 50
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  inputContainer: {
+    marginBottom: 20
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10
+  },
+  forgotPassword: {
+    color: '#FF5858',
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  orText: {
+    textAlign: 'center',
+    marginVertical: 20
+  },
+  signupPrompt: {
+    textAlign: 'center',
+    marginTop: 20
+  },
+  signupLink: {
+    color: '#FF5858',
+    fontWeight: 'bold'
+  }
+});
+

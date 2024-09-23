@@ -1,6 +1,6 @@
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/CustomCard';
 import UserCard from '@/components/userCard';
 import { Stack, useLocalSearchParams } from 'expo-router';
 
@@ -15,7 +15,7 @@ export default function Page() {
       headerImage={
         <Image
           source={{
-            uri: "https://www.github.com/a0m0rajab.png",
+            uri: "",
           }}
           className='h-full'
         />
@@ -23,8 +23,8 @@ export default function Page() {
       <Stack.Screen options={{ title: id as string }} />
       <Text>Blog post: {id}</Text>
       <UserCard
-        avatar="https://www.github.com/a0m0rajab.png"
-        name="a0m0rajab"
+        avatar=""
+        name=""
         role="Software Engineer"
         id="1"
       />
