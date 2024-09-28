@@ -110,7 +110,7 @@ export default function Account() {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text>Email</Text>
         <Input placeholder="Email" value={session?.user?.email} editable={false} />
-      </View>
+      </View>                 
       <View style={styles.verticallySpaced}>
         <Text>Full Name</Text>
         <Input placeholder="Full name" value={fullName || ''} onChangeText={(text) => setfullName(text)} />

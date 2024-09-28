@@ -2,13 +2,19 @@ import { router } from 'expo-router';
 import React from 'react';
 import { View, Image, Text, StyleSheet, Pressable } from 'react-native';
 
-const StoreCard = ({ logo, name, description } : { logo: any, name: string, description: string }) => {
-  const openStore = () => {
-    router.replace(`/store/${name}`);
-  };
-  
+const StoreCard = ({
+  logo,
+  name,
+  description,
+  onPress, // Nueva propiedad
+}: {
+  logo: any;
+  name: string;
+  description: string;
+  onPress: () => void; // Tipo de la nueva propiedad
+}) => {
   return (
-    <Pressable style={styles.card} onPress={openStore}>
+    <Pressable style={styles.card} onPress={onPress}>
       <View>
         <Image source={logo} style={styles.logo} />
         <Text style={styles.name}>{name}</Text>

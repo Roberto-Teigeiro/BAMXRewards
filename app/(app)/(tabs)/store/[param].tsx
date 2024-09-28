@@ -4,7 +4,8 @@ import { Button, View, Alert, Text, FlatList } from 'react-native';
 import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useSession } from '@/context';
-import StoreCard from "@/components/ui/storeCard"; // Adjust the path if necessary
+import StoreCard from "@/components/ui/storeCard"; 
+import QRCodeComponent from '@/components/ui/QRCode'; 
 
 export default function MyComponent() {
   const { param } = useLocalSearchParams();
@@ -26,6 +27,8 @@ export default function MyComponent() {
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [fullName, setfullName] = useState('');
+  const [qrVisible, setQrVisible] = useState(false);
+  const [selectedProductData, setSelectedProductData] = useState('');
 
   const productos: { [key: string]: { [key: string]: { description: string; logo: any } } } = {
     "Oxxo": {
@@ -35,24 +38,20 @@ export default function MyComponent() {
       "Chocolate Abuelita": { description: "Description of Product 4", logo: require('@/assets/images/chocolate.png') },
       "Gatorlyte": { description: "Description of Product 5", logo: require('@/assets/images/gatorlyte.png') },
     },
-
     "Walmart": {
       "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre3": { description: "Description of Product 3", logo: require('@/assets/images/favicon-scaled.png') },
     },
-
     "Cinepolis": {
       "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
     },
-
     "Soriana": {
       "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre3": { description: "Description of Product 3", logo: require('@/assets/images/favicon-scaled.png') },
     },
-
     "Costco": {
       "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
@@ -100,6 +99,11 @@ export default function MyComponent() {
     ? Object.entries(productos[paramValue]) 
     : [];
 
+  const handleProductPress = (productName: string) => {
+    setSelectedProductData(productName);
+    setQrVisible(true);
+  };
+
   return (
     <View>
       {paramValue && storeProducts.length > 0 ? (
@@ -112,6 +116,7 @@ export default function MyComponent() {
               logo={item[1].logo} 
               name={item[0]} 
               description={item[1].description} 
+              onPress={() => handleProductPress(item[0])} 
             />
           )}
         />
@@ -119,8 +124,15 @@ export default function MyComponent() {
         <Text>No valid param or no products available</Text>
       )}
 
+      {/* QR Code modal for selected product */}
+      <QRCodeComponent 
+        visible={qrVisible} 
+        onClose={() => setQrVisible(false)} 
+        productData={selectedProductData} 
+      />
+
       <Text>{session?.user?.email}</Text>
-      <Button title="Go to Store" />
+      <Button title="Go to Store" onPress={() => console.log("Navigating to Store...")} />
     </View>
   );
 }
