@@ -55,6 +55,10 @@ export default function MyComponent() {
     "Costco": {
       "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
       "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
+    },
+    "Merkabastos": {
+      "Nombre1": { description: "Description of Product 1", logo: require('@/assets/images/favicon-scaled.png') },
+      "Nombre2": { description: "Description of Product 2", logo: require('@/assets/images/favicon-scaled.png') },
     }
   };
 

@@ -4,48 +4,51 @@ import { supabase } from '@/utils/supabase';
 import { useSession } from '@/context';
 import { router } from 'expo-router';
 
-// Escucha cambios de estado de la app para gestionar la actualización automática de tokens
+// Escucha cambios de estado de la app para manejar la actualización automática de tokens
 AppState.addEventListener('change', (state) => {
   if (state === 'active') {
+    // Comienza a refrescar el token automáticamente cuando la app esté activa
     supabase.auth.startAutoRefresh();
   } else {
+    // Detiene el refresco automático cuando la app esté inactiva
     supabase.auth.stopAutoRefresh();
   }
 });
 
 export default function Auth() {
-  const { signIn } = useSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [showLostPassword, setShowLostPassword] = useState(false);
+  const { signIn } = useSession(); // Hook para manejar la sesión
+  const [email, setEmail] = useState(''); // Estado para almacenar el email
+  const [password, setPassword] = useState(''); // Estado para almacenar la contraseña
+  const [loading, setLoading] = useState(false); // Estado para manejar el indicador de carga
+  const [showRegister, setShowRegister] = useState(false); // Estado para alternar entre login y registro
+  const [showLostPassword, setShowLostPassword] = useState(false); // Estado para alternar la vista de recuperación de contraseña
 
   // Función para iniciar sesión con email y contraseña
   async function signInWithEmail() {
-    setLoading(true);
-    const { error } = await signIn(email, password);
-    
+    setLoading(true); // Inicia el indicador de carga
+    const { error } = await signIn(email, password); // Llama a la función de inicio de sesión
+
     if (error) {
-      Alert.alert(error.message);
-      setLoading(false);
+      Alert.alert(error.message); // Muestra un error si ocurre
+      setLoading(false); // Finaliza el indicador de carga si hay error
       return;
     }
 
-    router.replace('/');
-    setLoading(false);
+    router.replace('/'); // Redirecciona al home después de iniciar sesión
+    setLoading(false); // Finaliza el indicador de carga
   }
 
   // Función para registrar un nuevo usuario
   async function signUpWithEmail() {
-    setLoading(true);
-    const { data: { session }, error } = await supabase.auth.signUp({ email, password });
+    setLoading(true); // Inicia el indicador de carga
+    const { data: { session }, error } = await supabase.auth.signUp({ email, password }); // Llama a la función de registro de Supabase
 
-    if (error) Alert.alert(error.message);
-    if (!session) Alert.alert('Por favor, revisa tu bandeja de entrada para verificar tu email');
-    setLoading(false);
+    if (error) Alert.alert(error.message); // Muestra un error si ocurre
+    if (!session) Alert.alert('Por favor, revisa tu bandeja de entrada para verificar tu email'); // Pide al usuario verificar su correo
+    setLoading(false); // Finaliza el indicador de carga
   }
 
+  // Vista de recuperación de contraseña
   if (showLostPassword) {
     return (
       <ScrollView style={styles.container}>
@@ -69,6 +72,7 @@ export default function Auth() {
     );
   }
 
+  // Vista de inicio de sesión
   if (!showRegister) {
     return (
       <ScrollView style={styles.container}>
@@ -111,6 +115,7 @@ export default function Auth() {
     );
   }
 
+  // Vista de registro
   if (showRegister) {
     return (
       <ScrollView style={styles.container}>
