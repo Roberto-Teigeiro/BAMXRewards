@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { View, Image, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Image, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
 
 const StoreCard = ({
   logo,
@@ -14,17 +14,22 @@ const StoreCard = ({
   onPress: () => void; // Tipo de la nueva propiedad
 }) => {
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <View>
-        <Image source={logo} style={styles.logo} />
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.description}>{description}</Text>
-      </View>
-    </Pressable>
+    <SafeAreaView style={styles.safeArea}>
+      <Pressable style={styles.card} onPress={onPress}>
+        <View>
+          <Image source={logo} style={styles.logo} />
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.description}>{description}</Text>
+        </View>
+      </Pressable>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   card: {
     flex: 1,
     alignItems: 'center',
