@@ -3,6 +3,7 @@ import { Alert, StyleSheet, View, AppState, Button, Image, ScrollView, TextInput
 import { supabase } from '@/utils/supabase';
 import { useSession } from '@/context';
 import { router } from 'expo-router';
+import { FadeInRight } from 'react-native-reanimated';
 
 // Escucha cambios de estado de la app para manejar la actualización automática de tokens
 AppState.addEventListener('change', (state) => {
@@ -123,7 +124,7 @@ export default function Auth() {
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
         />
-        <Text style={styles.title}>Regístrate</Text>
+        <Text style={styles.title}>Crea tu cuenta</Text>
         <TextInput
           style={styles.input}
           placeholder="Escribe tu correo electrónico"
@@ -155,8 +156,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logo: {
-    height: 110,
-    width: 120,
+    height: 150,
+    width: 180,
     alignSelf: 'center',
     margin: 50,
   },
@@ -164,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    paddingBottom: 10,
   },
   subtitle: {
     fontSize: 18,
@@ -182,20 +184,24 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   forgotPassword: {
-    color: '#FF5858',
-    textAlign: 'center',
+    color: '#FFB330',
+    textAlign: 'right',
     marginBottom: 20,
+    textDecorationLine: 'underline',
+    fontWeight: 'bold',
   },
   orText: {
     textAlign: 'center',
     marginVertical: 20,
+    fontWeight: 'bold',
   },
   signupPrompt: {
     textAlign: 'center',
     marginTop: 20,
   },
   signupLink: {
-    color: '#FF5858',
+    color: '#FFB330',
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });

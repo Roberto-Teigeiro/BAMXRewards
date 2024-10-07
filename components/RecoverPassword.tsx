@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState, Button, Image } from 'react-native'
+import { Alert, StyleSheet, View, AppState, Button, Image, YellowBox } from 'react-native'
 import {TextInput , ScrollView } from 'react-native';
 import { supabase } from '@/utils/supabase'
 import { Input } from './ui/input'

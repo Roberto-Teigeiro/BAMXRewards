@@ -1,52 +1,81 @@
-import {router} from 'expo-router';
 import React from 'react';
-import { View, Image, Text, StyleSheet, Pressable } from 'react-native';
+import { router } from 'expo-router';
+import { View, Text, Image, StyleSheet, Pressable, ImageSourcePropType, SafeAreaView } from 'react-native';
 
-const CustomCard = ({ logo, name } : {logo: any, name:string}) => {
-
-
-const openStore = () =>{
-  router.replace(`/store/${name}`)
+// Definir los tipos de las props
+interface CustomCardProps {
+  logo: ImageSourcePropType;
+  name: string;
 }
-   
+
+// Objeto que define colores específicos para cada tienda
+const storeColors: { [key: string]: string } = {
+  Oxxo: '#c32421',      
+  Walmart: '#1a75cf', 
+  Cinepolis: '#08285b', 
+  Soriana: '#fff',    
+  Costco: '#fff', 
+  Merkabastos: "#fff",    
+  Chedraui: '#fff', 
+  "OK Pastelería": '#f08273', 
+  "La Gorda": "#cad8d1",
+  "El Panqué": "#fff",
+  "Pan Bueno": "#231f20",
+  Manhattan: "fff",
+  Cinemex: "#fc1543",
+  Ohlala: "", 
+};
+
+// Componente CustomCard que recibe logo y name como props
+const CustomCard: React.FC<CustomCardProps> = ({ logo, name }) => {
+  // Obtener el color correspondiente para la tienda o usar un color por defecto
+  const backgroundColor = storeColors[name] || '#FFFFFF';  // Blanco por defecto si no hay coincidencia
+
+  const openStore = () => {
+    router.replace(`/store/${name}`);
+  };
+
   return (
-    <Pressable style={styles.card} onPress={openStore}>
-    <View >
-      
-      <Image source={logo} style={styles.logo} />
-      <Text style={styles.name}>{name}</Text>
-      
-    </View>
-    </Pressable>
+    <SafeAreaView style={styles.safeArea}>
+      <Pressable style={[styles.card, { backgroundColor }]} onPress={openStore}>
+        {/* Logo de la tienda */}
+        <Image source={logo} style={styles.logo} />
+        {/* Nombre del partner debajo del logo */}
+        <Text style={styles.name}>{name}</Text>
+      </Pressable>
+    </SafeAreaView>
   );
 };
 
+// Estilos para el componente
 const styles = StyleSheet.create({
-  card: {
+  safeArea: {
     flex: 1,
+  },
+  card: {
+    margin: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 5,
-    padding: 10,
-    backgroundColor: '#FFF', // White background
-    borderRadius: 12, // Rounded corners
-    shadowColor: '#000', // Shadow for iOS
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 3, // Shadow for Android
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    paddingTop: 10,
   },
   logo: {
-    width: 60, // Set your desired width
-    height: 60, // Set your desired height
-    resizeMode: 'contain' // Keep the image aspect ratio
+    width: 150,
+    height: 100,
+    resizeMode: 'contain',
   },
   name: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#333', // Dark grey color for the text
-    textAlign: 'center' // Center the text
-  }
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
 
 export default CustomCard;
