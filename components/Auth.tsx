@@ -46,6 +46,8 @@ export default function Auth() {
   if (showLostPassword) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        {/* Título de la página */}
+        <Text style={styles.recuperarps}>Recuperar Contraseña</Text>
         <Image
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
@@ -54,12 +56,13 @@ export default function Auth() {
         <TextInput
           style={styles.input}
           placeholder="Escribe tu correo electrónico"
+          placeholderTextColor="#545454"  
           onChangeText={setEmail}
           value={email}
           autoCapitalize="none"
         />
         <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
-          <Text style={styles.signInButtonText}>Recuperar</Text>
+          <Text style={styles.signInButtonText}>Enviar código</Text>
         </TouchableOpacity>
         <Text style={styles.signupPrompt}>
           ¿Ya tienes cuenta?{' '}
@@ -151,25 +154,48 @@ export default function Auth() {
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
         />
-        <Text style={styles.title}>Crea tu cuenta</Text>
+         {/* Título y subtítulo */}
+        <Text style={styles.title}>¡Hola!</Text>
+        <Text style={styles.subtitle}>Crea tu Cuenta</Text>
+        {/* Campos de entrada */}
         <TextInput
           style={styles.input}
           placeholder="Escribe tu correo electrónico"
+          placeholderTextColor="#545454"  
           onChangeText={setEmail}
           value={email}
           autoCapitalize="none"
         />
+
         <TextInput
           style={styles.input}
           placeholder="Escribe tu contraseña"
+          placeholderTextColor="#545454"
           onChangeText={setPassword}
           value={password}
           secureTextEntry={true}
           autoCapitalize="none"
         />
+
         <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
           <Text style={styles.signInButtonText}>Registrarme</Text>
         </TouchableOpacity>
+         {/* Texto "O usa una de tus redes" */}
+         <Text style={styles.orText}>O usa una de tus redes</Text>
+
+         {/* Botones de redes sociales */}
+         <View style={styles.socialButtonsContainer}>
+          <TouchableOpacity style={styles.socialButton}>
+            <Image source={require('@/assets/images/google-icon.png')} style={styles.socialIcon} />
+            <Text style={styles.socialButtonText}>Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialButton}>
+            <Image source={require('@/assets/images/facebook-icon.png')} style={styles.socialIcon} />
+            <Text style={styles.socialButtonText}>Facebook</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.signupPrompt}>
           ¿Ya tienes cuenta?{' '}
           <Text style={styles.signupLink} onPress={() => setShowRegister(false)}>
@@ -183,16 +209,24 @@ export default function Auth() {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,  // Important for ScrollView content to grow and allow centering
-    justifyContent: 'center',
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
+  },
+  recuperarps: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20, 
+    alignSelf: 'flex-start',
+    color: '#E70020',
+    marginTop: 40,
   },
   logo: {
     height: 150,
     width: 180,
     alignSelf: 'center',
     marginBottom: 30,
+    marginTop: 70,
   },
   title: {
     fontSize: 20,
@@ -240,10 +274,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   signupPrompt: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 30,
+    marginBottom: 15,
   },
   signupLink: {
     color: '#FFB330',
@@ -276,3 +312,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+

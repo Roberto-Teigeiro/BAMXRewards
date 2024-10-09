@@ -15,6 +15,8 @@ const RecoverPassword = () => {
       // Aquí enviarías el correo electrónico al backend
       console.log('Enviar correo para recuperar contraseña:', email);
       // Implementar la lógica para comunicarse con el backend
+
+      
     };
   
     return (
@@ -27,6 +29,7 @@ const RecoverPassword = () => {
           placeholder="Correo electrónico vinculado"
           keyboardType="email-address"
         />
+        
         <Button
           title="Enviar código"
           onPress={handleRecoverPassword}
