@@ -1,58 +1,51 @@
-import React, { useState } from 'react';
-import { Alert, StyleSheet, View, AppState, Button, Image, ScrollView, TextInput, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, StyleSheet, View, Image, ScrollView, TextInput, Text, TouchableOpacity, AppState } from 'react-native'; // Importa AppState
 import { supabase } from '@/utils/supabase';
 import { useSession } from '@/context';
 import { router } from 'expo-router';
 import { FadeInRight } from 'react-native-reanimated';
 
-// Escucha cambios de estado de la app para manejar la actualización automática de tokens
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    // Comienza a refrescar el token automáticamente cuando la app esté activa
-    supabase.auth.startAutoRefresh();
-  } else {
-    // Detiene el refresco automático cuando la app esté inactiva
-    supabase.auth.stopAutoRefresh();
-  }
-});
-
 export default function Auth() {
-  const { signIn } = useSession(); // Hook para manejar la sesión
-  const [email, setEmail] = useState(''); // Estado para almacenar el email
-  const [password, setPassword] = useState(''); // Estado para almacenar la contraseña
-  const [loading, setLoading] = useState(false); // Estado para manejar el indicador de carga
-  const [showRegister, setShowRegister] = useState(false); // Estado para alternar entre login y registro
-  const [showLostPassword, setShowLostPassword] = useState(false); // Estado para alternar la vista de recuperación de contraseña
+  const { signIn } = useSession();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLostPassword, setShowLostPassword] = useState(false);
 
-  // Función para iniciar sesión con email y contraseña
+  // Escucha cambios de estado de la app para manejar la actualización automática de tokens
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        // Comienza a refrescar el token automáticamente cuando la app esté activa
+        supabase.auth.startAutoRefresh();
+      } else {
+        // Detiene el refresco automático cuando la app esté inactiva
+        supabase.auth.stopAutoRefresh();
+      }
+    });
+
+    // Limpia el event listener cuando el componente se desmonte
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   async function signInWithEmail() {
-    setLoading(true); // Inicia el indicador de carga
-    const { error } = await signIn(email, password); // Llama a la función de inicio de sesión
-
+    setLoading(true);
+    const { error } = await signIn(email, password);
     if (error) {
-      Alert.alert(error.message); // Muestra un error si ocurre
-      setLoading(false); // Finaliza el indicador de carga si hay error
+      Alert.alert(error.message);
+      setLoading(false);
       return;
     }
-
-    router.replace('/'); // Redirecciona al home después de iniciar sesión
-    setLoading(false); // Finaliza el indicador de carga
+    router.replace('/');
+    setLoading(false);
   }
 
-  // Función para registrar un nuevo usuario
-  async function signUpWithEmail() {
-    setLoading(true); // Inicia el indicador de carga
-    const { data: { session }, error } = await supabase.auth.signUp({ email, password }); // Llama a la función de registro de Supabase
-
-    if (error) Alert.alert(error.message); // Muestra un error si ocurre
-    if (!session) Alert.alert('Por favor, revisa tu bandeja de entrada para verificar tu email'); // Pide al usuario verificar su correo
-    setLoading(false); // Finaliza el indicador de carga
-  }
-
-  // Vista de recuperación de contraseña
   if (showLostPassword) {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Image
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
@@ -65,25 +58,33 @@ export default function Auth() {
           value={email}
           autoCapitalize="none"
         />
-        <Button title="Recuperar" disabled={loading} onPress={signUpWithEmail} color="#FF5858" />
+        <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
+          <Text style={styles.signInButtonText}>Recuperar</Text>
+        </TouchableOpacity>
         <Text style={styles.signupPrompt}>
-          ¿Ya tienes cuenta? <Text style={styles.signupLink} onPress={() => setShowLostPassword(false)}>Inicia sesión</Text>
+          ¿Ya tienes cuenta?{' '}
+          <Text style={styles.signupLink} onPress={() => setShowLostPassword(false)}>
+            Inicia sesión
+          </Text>
         </Text>
       </ScrollView>
     );
   }
 
-  // Vista de inicio de sesión
   if (!showRegister) {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Logo grande centrado */}
         <Image
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
         />
+
+        {/* Texto de bienvenida */}
         <Text style={styles.title}>Bienvenido de Nuevo</Text>
         <Text style={styles.subtitle}>Inicia Sesión</Text>
-        
+
+        {/* Campos de entrada */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -100,26 +101,48 @@ export default function Auth() {
             secureTextEntry={true}
             autoCapitalize="none"
           />
-          <Button title="Iniciar Sesión" disabled={loading} onPress={signInWithEmail} color="#FF5858" />
-          <Text style={styles.forgotPassword} onPress={() => setShowLostPassword(true)}>¿Olvidaste tu contraseña?</Text>
         </View>
-        
-        <Text style={styles.orText}>O usa una de tus redes</Text>
-        
-        <Button title="Google" onPress={() => Alert.alert('Work in progress')} color="#DB4437" />
-        <Button title="Facebook" onPress={() => Alert.alert('Work in progress')} color="#4267B2" />
 
+        {/* Botón de inicio de sesión */}
+        <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
+          <Text style={styles.signInButtonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+
+        {/* Olvidaste tu contraseña */}
+        <Text style={styles.forgotPassword} onPress={() => setShowLostPassword(true)}>
+          ¿Olvidaste tu contraseña?
+        </Text>
+
+        {/* Texto "O usa una de tus redes" */}
+        <Text style={styles.orText}>O usa una de tus redes</Text>
+
+        {/* Botones de redes sociales */}
+        <View style={styles.socialButtonsContainer}>
+          <TouchableOpacity style={styles.socialButton}>
+            <Image source={require('@/assets/images/google-icon.png')} style={styles.socialIcon} />
+            <Text style={styles.socialButtonText}>Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialButton}>
+            <Image source={require('@/assets/images/facebook-icon.png')} style={styles.socialIcon} />
+            <Text style={styles.socialButtonText}>Facebook</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Registro */}
         <Text style={styles.signupPrompt}>
-          ¿No tienes una cuenta? <Text style={styles.signupLink} onPress={() => setShowRegister(true)}>Regístrate gratis</Text>
+          ¿No tienes una cuenta?{' '}
+          <Text style={styles.signupLink} onPress={() => setShowRegister(true)}>
+            Regístrate gratis
+          </Text>
         </Text>
       </ScrollView>
     );
   }
 
-  // Vista de registro
   if (showRegister) {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Image
           source={require('@/assets/images/favicon-scaled.png')}
           style={styles.logo}
@@ -140,9 +163,14 @@ export default function Auth() {
           secureTextEntry={true}
           autoCapitalize="none"
         />
-        <Button title="Registrarme" disabled={loading} onPress={signUpWithEmail} color="#FF5858" />
+        <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
+          <Text style={styles.signInButtonText}>Registrarme</Text>
+        </TouchableOpacity>
         <Text style={styles.signupPrompt}>
-          ¿Ya tienes cuenta? <Text style={styles.signupLink} onPress={() => setShowRegister(false)}>Inicia sesión</Text>
+          ¿Ya tienes cuenta?{' '}
+          <Text style={styles.signupLink} onPress={() => setShowRegister(false)}>
+            Inicia sesión
+          </Text>
         </Text>
       </ScrollView>
     );
@@ -151,7 +179,8 @@ export default function Auth() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,  // Important for ScrollView content to grow and allow centering
+    justifyContent: 'center',
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -159,19 +188,18 @@ const styles = StyleSheet.create({
     height: 150,
     width: 180,
     alignSelf: 'center',
-    margin: 50,
+    marginBottom: 30,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
     paddingBottom: 10,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   inputContainer: {
     marginBottom: 20,
@@ -179,9 +207,21 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  signInButton: {
+    backgroundColor: '#FF5858',
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  signInButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   forgotPassword: {
     color: '#FFB330',
@@ -203,5 +243,30 @@ const styles = StyleSheet.create({
     color: '#FFB330',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+  },
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  socialButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 8,
+    width: 150,
+    justifyContent: 'center',
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+  },
+  socialButtonText: {
+    fontSize: 16,
+    color: '#333',
   },
 });

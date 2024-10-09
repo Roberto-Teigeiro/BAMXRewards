@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/utils/supabase'
-import { StyleSheet, View, Alert, Button } from 'react-native'
+import { StyleSheet, View, Alert, Button, TouchableOpacity } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { Input } from './ui/input'
 import { Text } from './ui/text'
@@ -22,10 +22,8 @@ export default function Account() {
   }, [])
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [fullName, setfullName] = useState('')
-
 
   useEffect(() => {
     if (session) getProfile()
@@ -38,7 +36,7 @@ export default function Account() {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url, full_name`)
+        .select(`username, avatar_url, full_name`)
         .eq('id', session?.user.id)
         .single()
       if (error && status !== 406) {
@@ -47,7 +45,6 @@ export default function Account() {
 
       if (data) {
         setUsername(data.username)
-        setWebsite(data.website)
         setAvatarUrl(data.avatar_url)
         setfullName(data.full_name)
       }
@@ -62,12 +59,10 @@ export default function Account() {
 
   async function updateProfile({
     username,
-    website,
     avatar_url,
     fullName
   }: {
     username: string
-    website: string
     avatar_url: string,
     fullName: string
   }) {
@@ -78,7 +73,6 @@ export default function Account() {
       const updates = {
         id: session?.user.id,
         username,
-        website,
         avatar_url,
         updated_at: new Date(),
         full_name: fullName
@@ -99,57 +93,120 @@ export default function Account() {
   }
 
   return (
-    <View style={styles.container} className='justify-center align-items-middle'>
-      <AvatarUploader
-        size={200}
-        url={avatarUrl}
-        onUpload={(url: string) => {
-          setAvatarUrl(url)
-          updateProfile({ username, website, avatar_url: url, fullName })
-        }}/>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Text>Email</Text>
-        <Input placeholder="Email" value={session?.user?.email} editable={false} />
-      </View>                 
-      <View style={styles.verticallySpaced}>
-        <Text>Full Name</Text>
-        <Input placeholder="Full name" value={fullName || ''} onChangeText={(text) => setfullName(text)} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Text>Username</Text>
-        <Input placeholder="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Text>Website</Text>
-        <Input placeholder="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl, fullName })}
-          disabled={loading}
+    <View style={styles.container}>
+      {/* Avatar */}
+      <View style={styles.avatarContainer}>
+        <AvatarUploader
+          size={80}
+          url={avatarUrl}
+          onUpload={(url: string) => {
+            setAvatarUrl(url)
+            updateProfile({ username, avatar_url: url, fullName })
+          }}
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => signOut()} />
+      {/* Nombre completo */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Nombre</Text>
+        <Input
+          placeholder="Nombre"
+          value={fullName || 'NA'}
+          onChangeText={(text) => setfullName(text)}
+          style={styles.input}
+        />
       </View>
+
+      {/* Nombre de usuario */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Nombre de usuario</Text>
+        <Input
+          placeholder="Nombre de usuario"
+          value={username || 'NA'}
+          onChangeText={(text) => setUsername(text)}
+          style={styles.input}
+        />
+      </View>
+
+      {/* Correo electrónico */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Correo electrónico vinculado</Text>
+        <Input
+          placeholder="Correo electrónico"
+          value={session?.user?.email}
+          editable={false}
+          style={styles.input}
+        />
+      </View>
+
+      {/* Contraseña (placeholder para demostración) */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Contraseña</Text>
+        <Input
+          placeholder="********"
+          value="********"
+          editable={false}
+          style={styles.input}
+        />
+      </View>
+
+      {/* Ver historial de cupones */}
+      <TouchableOpacity style={styles.linkContainer}>
+        <Text style={styles.linkText}>Ver historial de cupones</Text>
+      </TouchableOpacity>
+
+      {/* Botón de cerrar sesión */}
+      <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()}>
+        <Text style={styles.signOutButtonText}>Cerrar sesión</Text>
+      </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  input: {
+    borderColor: '#E0E0E0',
+    borderWidth: 1,
+    borderRadius: 8,
     padding: 12,
+    backgroundColor: '#F5F5F5',
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
+  linkContainer: {
     marginTop: 20,
+    marginBottom: 40,
+    alignItems: 'center',
+  },
+  linkText: {
+    color: '#FF9900',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  signOutButton: {
+    backgroundColor: '#D32F2F',
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  signOutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 })
