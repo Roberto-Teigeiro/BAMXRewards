@@ -1,6 +1,7 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import CustomCard from '@/components/ui/CustomCard';
+
 const partners = [
   { id: '1', logo: require('@/assets/images/oxxo.png'), name: 'Oxxo' },
   { id: '2', logo: require('@/assets/images/walmart.png'), name: 'Walmart' },
@@ -21,24 +22,38 @@ const partners = [
 
 const App = () => {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <FlatList
+        ListHeaderComponent={<Text style={styles.title}>Nuestros Aliados</Text>} // Coloca el título como parte del contenido desplazable
         data={partners}
         renderItem={({ item }) => (
           <CustomCard logo={item.logo} name={item.name} />
         )}
-        numColumns={2} // Change this as needed
+        numColumns={2} // Cambia esto según sea necesario
         keyExtractor={item => item.id}
+        contentContainerStyle={styles.contentContainer} // Asegura que el contenido tenga un padding adecuado
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    marginTop: 20
-  }
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: 20,
+    paddingHorizontal: 10,
+    color: '#E70020',
+    alignSelf: 'flex-start',
+  },
+  contentContainer: {
+    paddingHorizontal: 10,
+  },
 });
 
 export default App;

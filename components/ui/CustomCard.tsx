@@ -21,9 +21,9 @@ const storeColors: { [key: string]: string } = {
   "La Gorda": "#cad8d1",
   "El Panqué": "#fff",
   "Pan Bueno": "#231f20",
-  Manhattan: "fff",
+  Manhattan: "#fff", // Corregido: faltaba el símbolo de # para el color
   Cinemex: "#fc1543",
-  Ohlala: "", 
+  Ohlala: "#fff", // Corregido: agregado un color por defecto
 };
 
 // Componente CustomCard que recibe logo y name como props
@@ -40,9 +40,9 @@ const CustomCard: React.FC<CustomCardProps> = ({ logo, name }) => {
       <Pressable style={[styles.card, { backgroundColor }]} onPress={openStore}>
         {/* Logo de la tienda */}
         <Image source={logo} style={styles.logo} />
-        {/* Nombre del partner debajo del logo */}
-        <Text style={styles.name}>{name}</Text>
       </Pressable>
+      {/* Nombre del partner debajo del logo */}
+      <Text style={styles.name}>{name}</Text>
     </SafeAreaView>
   );
 };
@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
     paddingTop: 10,
+    marginBottom: 5,
+    marginTop: 30,
   },
   logo: {
     width: 150,

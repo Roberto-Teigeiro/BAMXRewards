@@ -86,21 +86,25 @@ export default function Auth() {
 
         {/* Campos de entrada */}
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Escribe tu correo electrónico"
-            onChangeText={setEmail}
-            value={email}
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Escribe tu contraseña"
-            onChangeText={setPassword}
-            value={password}
-            secureTextEntry={true}
-            autoCapitalize="none"
-          />
+        <TextInput
+          style={styles.input}
+          placeholder="Escribe tu correo electrónico"
+          placeholderTextColor="#545454"  
+          onChangeText={setEmail}
+          value={email}
+          autoCapitalize="none"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Escribe tu contraseña"
+          placeholderTextColor="#545454"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={true}
+          autoCapitalize="none"
+        />
+
         </View>
 
         {/* Botón de inicio de sesión */}
@@ -191,13 +195,13 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     paddingBottom: 10,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 45,
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -210,9 +214,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
+    backgroundColor: "#f9f9f9",
+    fontSize: 17,
   },
   signInButton: {
-    backgroundColor: '#FF5858',
+    backgroundColor: '#E00034',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',

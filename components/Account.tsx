@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/utils/supabase'
-import { StyleSheet, View, Alert, Button, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Alert, TouchableOpacity, SafeAreaView, Text, ScrollView } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { Input } from './ui/input'
-import { Text } from './ui/text'
 import AvatarUploader from './AvatarUploader'
 import { useSession } from '@/context'
 
@@ -20,6 +19,7 @@ export default function Account() {
       setSession(session)
     })
   }, [])
+
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
@@ -39,6 +39,7 @@ export default function Account() {
         .select(`username, avatar_url, full_name`)
         .eq('id', session?.user.id)
         .single()
+
       if (error && status !== 406) {
         throw error
       }
@@ -93,85 +94,110 @@ export default function Account() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Avatar */}
-      <View style={styles.avatarContainer}>
-        <AvatarUploader
-          size={80}
-          url={avatarUrl}
-          onUpload={(url: string) => {
-            setAvatarUrl(url)
-            updateProfile({ username, avatar_url: url, fullName })
-          }}
-        />
-      </View>
+    <SafeAreaView style={styles.container}> 
+      {/* Hacer scrollable el contenido */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.contentContainer}>
+          {/* Título de la página */}
+          <Text style={styles.title}>Perfil</Text>
 
-      {/* Nombre completo */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Nombre</Text>
-        <Input
-          placeholder="Nombre"
-          value={fullName || 'NA'}
-          onChangeText={(text) => setfullName(text)}
-          style={styles.input}
-        />
-      </View>
+          {/* Avatar */}
+          <View style={styles.avatarContainer}>
+            <AvatarUploader
+              size={80}
+              url={avatarUrl}
+              onUpload={(url: string) => {
+                setAvatarUrl(url)
+                updateProfile({ username, avatar_url: url, fullName })
+              }}
+            />
+          </View>
 
-      {/* Nombre de usuario */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Nombre de usuario</Text>
-        <Input
-          placeholder="Nombre de usuario"
-          value={username || 'NA'}
-          onChangeText={(text) => setUsername(text)}
-          style={styles.input}
-        />
-      </View>
+          {/* Nombre completo */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Nombre</Text>
+            <Input
+              placeholder="Nombre"
+              value={fullName || 'NA'}
+              onChangeText={(text) => setfullName(text)}
+              style={styles.input}
+            />
+          </View>
 
-      {/* Correo electrónico */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Correo electrónico vinculado</Text>
-        <Input
-          placeholder="Correo electrónico"
-          value={session?.user?.email}
-          editable={false}
-          style={styles.input}
-        />
-      </View>
+          {/* Nombre de usuario */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Usuario</Text>
+            <Input
+              placeholder="Nombre de usuario"
+              value={username || 'NA'}
+              onChangeText={(text) => setUsername(text)}
+              style={styles.input}
+            />
+          </View>
 
-      {/* Contraseña (placeholder para demostración) */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Contraseña</Text>
-        <Input
-          placeholder="********"
-          value="********"
-          editable={false}
-          style={styles.input}
-        />
-      </View>
+          {/* Correo electrónico */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Correo electrónico vinculado</Text>
+            <Input
+              placeholder="Correo electrónico"
+              value={session?.user?.email || 'No disponible'}
+              editable={false}
+              style={styles.input}
+            />
+          </View>
 
-      {/* Ver historial de cupones */}
-      <TouchableOpacity style={styles.linkContainer}>
-        <Text style={styles.linkText}>Ver historial de cupones</Text>
-      </TouchableOpacity>
+          {/* Contraseña */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Contraseña</Text>
+            <Input
+              placeholder="********"
+              value="********"
+              editable={false}
+              style={styles.input}
+            />
+          </View>
 
-      {/* Botón de cerrar sesión */}
-      <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()}>
-        <Text style={styles.signOutButtonText}>Cerrar sesión</Text>
-      </TouchableOpacity>
-    </View>
+          {/* Ver historial de cupones */}
+          <TouchableOpacity style={styles.linkContainer}>
+            <Text style={styles.linkText}>Ver historial de cupones</Text>
+          </TouchableOpacity>
+
+          {/* Botón de cerrar sesión */}
+          <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()}>
+            <Text style={styles.signOutButtonText}>Cerrar sesión</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    alignItems: 'center',
+    paddingVertical: 20, // Asegura que el contenido tenga espacio superior e inferior
+  },
+  contentContainer: {
+    maxWidth: 400,
+    width: '100%',
+    paddingHorizontal: 20, // Añade algo de padding horizontal
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20, 
+    alignSelf: 'flex-start',
+    color: '#E70020',
+    
   },
   avatarContainer: {
     alignItems: 'center',
     marginBottom: 30,
+    marginTop: 40,
   },
   inputContainer: {
     marginBottom: 20,
@@ -199,7 +225,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   signOutButton: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: '#E00034',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
