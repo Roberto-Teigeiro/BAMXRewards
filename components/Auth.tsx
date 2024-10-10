@@ -11,7 +11,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [showLostPassword, setShowLostPassword] = useState(false);
+  const [showLostPassword, setShowLostPassword] = useState(false);  
 
   // Escucha cambios de estado de la app para manejar la actualización automática de tokens
   useEffect(() => {
@@ -30,6 +30,16 @@ export default function Auth() {
       subscription.remove();
     };
   }, []);
+  async function sendResetPasswordEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      Alert.alert(error.message);
+    } else {
+      Alert.alert('Se ha enviado un correo para restablecer tu contraseña.');
+    }
+    setLoading(false);
+  }
 
   async function signInWithEmail() {
     setLoading(true);
@@ -41,6 +51,21 @@ export default function Auth() {
     }
     router.replace('/');
     setLoading(false);
+  }
+  
+  async function signUpWithEmail() {
+    setLoading(true)
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
+    setLoading(false)
   }
 
   if (showLostPassword) {
@@ -61,7 +86,7 @@ export default function Auth() {
           value={email}
           autoCapitalize="none"
         />
-        <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
+        <TouchableOpacity style={styles.signInButton} onPress={sendResetPasswordEmail} disabled={loading}>
           <Text style={styles.signInButtonText}>Enviar código</Text>
         </TouchableOpacity>
         <Text style={styles.signupPrompt}>
@@ -177,7 +202,7 @@ export default function Auth() {
           autoCapitalize="none"
         />
 
-        <TouchableOpacity style={styles.signInButton} onPress={signInWithEmail} disabled={loading}>
+        <TouchableOpacity style={styles.signInButton} onPress={signUpWithEmail} disabled={loading}>
           <Text style={styles.signInButtonText}>Registrarme</Text>
         </TouchableOpacity>
          {/* Texto "O usa una de tus redes" */}

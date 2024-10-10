@@ -99,6 +99,7 @@ export default function Account() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.contentContainer}>
           {/* Título de la página */}
+          <Text style={styles.title}>{session?.user.id}</Text>
           <Text style={styles.title}>Perfil</Text>
 
           {/* Avatar */}

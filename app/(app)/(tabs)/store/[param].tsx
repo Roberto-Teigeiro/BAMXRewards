@@ -82,9 +82,14 @@ export default function MyComponent() {
     }
   }
 
-  const handleProductPress = (productName: string) => {
-    setSelectedProductData(productName);
-    setQrVisible(true);
+  const handleProductPress = (voucherId: number) => {
+    if (session?.user.id) {
+      setSelectedProductData(voucherId + ',' + session.user.id);
+      setQrVisible(true);
+    } else {
+      console.error('User ID is undefined');
+      Alert.alert('Error', 'Unable to generate QR code. Please try again.');
+    }
   };
 
   // Objeto de mapeo para las imágenes de los productos
@@ -98,13 +103,15 @@ export default function MyComponent() {
   };
 
   // Suponiendo que quieres obtener el nombre de la tienda de los productos
-  const storeName = param as string; // Puedes ajustar esto según cómo obtengas el nombre de la tienda
+  const storeName = param as string; 
 
   return (
     <View>
       {loading ? (
         <Text>Loading products...</Text>
+
       ) : products.length > 0 ? (
+        
         <FlatList
           data={products}
           numColumns={2} 
@@ -114,7 +121,7 @@ export default function MyComponent() {
               logo={productImages[item.logo_path] || require('@/assets/images/favicon-scaled.png')}
               name={item.name} 
               description={item.description} 
-              onPress={() => handleProductPress(item.name)} 
+              onPress={() => handleProductPress(item.id)} 
             />
           )}
         />
@@ -122,12 +129,14 @@ export default function MyComponent() {
         <Text>No products available for this store</Text>
       )}
 
-      <QRCodeComponent 
-        visible={qrVisible} 
-        onClose={() => setQrVisible(false)} 
-        productData={selectedProductData} 
-        store={storeName}
-      />
+      {qrVisible && (
+        <QRCodeComponent 
+          visible={qrVisible} 
+          onClose={() => setQrVisible(false)} 
+          productData={selectedProductData} 
+          store={storeName}
+        />
+      )}
 
       <Button title="Go to Store" onPress={() => console.log("Navigating to Store...")} />
     </View>
