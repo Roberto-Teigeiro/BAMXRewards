@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, SafeAreaView, Image } from 'react-native';
+import { FlatList, StyleSheet, Text, SafeAreaView, TouchableOpacity } from 'react-native';
 import { createClient } from '@supabase/supabase-js';
 import CustomCard from '@/components/ui/CustomCard';
+import { supabase } from '@/utils/supabase'; 
+import { useRouter } from 'expo-router'; 
 
-// Asegúrate de reemplazar estos valores con tus propias credenciales de Supabase
-const supabaseUrl = 'https://lihzaprklohfdxnnudzh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpaHphcHJrbG9oZmR4bm51ZHpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY2NzQzMzcsImV4cCI6MjA0MjI1MDMzN30.b8i2VyqTGQgxZ2tndE11H0xTAjEKVtHLYkzAs__WOSw';
+const supabaseUrl = process.env.EXPO_PUBLIC_DATABASE_URL || "";
+const supabaseKey = process.env.EXPO_PUBLIC_DATABASE_ANON_KEY || "";
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 interface Retailer {
   id: number;
@@ -35,25 +36,79 @@ const images = {
 
 const App = () => {
   const [retailers, setRetailers] = useState<Retailer[]>([]);
+  const [session, setSession] = useState(null);
+  const router = useRouter(); // Initialize the router
 
   useEffect(() => {
-    fetchRetailers();
+    // Fetch the current session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+
+    getSession();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
+  useEffect(() => {
+    if (session) {
+      fetchRetailers();
+      checkUserPermissions();
+    } else {
+      console.log('No user logged in');
+    }
+  }, [session]);
+
   async function fetchRetailers() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('retailers')
       .select('*');
     if (error) {
       console.error('Error fetching retailers:', error);
     } else {
-      console.log('Retailers:', data);
       setRetailers(data as Retailer[]);
     }
   }
 
+  const checkUserPermissions = async () => {
+    if (!session?.user) return;
+
+    // Fetch user profile to check role
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role, retailer_id')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user role:', error);
+      return;
+    }
+
+    if (data) {
+      // You can add additional logic for other roles here if needed
+    }
+  };
+
+  const handleAdminRedirect = () => {
+    router.replace('/admin'); // Redirect to the admin page when the button is pressed
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Button to navigate to admin */}
+      <TouchableOpacity style={styles.adminButton} onPress={handleAdminRedirect}>
+        <Text style={styles.adminButtonText}>Entra como administrador de tienda</Text>
+      </TouchableOpacity>
+
       <FlatList
         ListHeaderComponent={<Text style={styles.title}>Nuestros Aliados</Text>}
         data={retailers}
@@ -87,6 +142,18 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 10,
+  },
+  adminButton: {
+    backgroundColor: '#E70020', // Change the button color as needed
+    padding: 10,
+    borderRadius: 5,
+    margin: 10,
+    alignItems: 'center',
+  },
+  adminButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

@@ -26,10 +26,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="admin"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="store/[param]"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
