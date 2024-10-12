@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, TouchableOpacity, ActivityIndicator, View, Button } from 'react-native';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
+import { CameraView, CameraType, FlashMode, CameraMode, useCameraPermissions } from 'expo-camera';
 
 const AdminDashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState(null);
   const [retailer, setRetailer] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
-  const router = useRouter(); // Initialize the router
+  const [loading, setLoading] = useState(true);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [scanned, setScanned] = useState(false);
+  const router = useRouter();
+  const [torchEnabled, setTorchEnabled] = useState(false); // Manage torch state
 
   useEffect(() => {
-    // Get the session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false); // Set loading to false after session is fetched
+      setLoading(false);
     });
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setLoading(false); // Set loading to false when auth state changes
+      setLoading(false);
     });
 
     return () => {
@@ -56,7 +59,7 @@ const AdminDashboard = () => {
     setUserProfile(data);
 
     if (data?.retailer_id) {
-      fetchRetailer(data.retailer_id); // Fetch retailer if retailer ID exists
+      fetchRetailer(data.retailer_id);
     }
   };
 
@@ -78,10 +81,45 @@ const AdminDashboard = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.replace('/'); // Redirect to the home page after sign out
+    router.replace('/');
   };
 
-  // Show loading indicator if loading
+  const handleBarcodeScanned = async ({ data }: { data: string }) => {
+    console.log(data)
+    setScanned(true);
+
+    // Assuming the QR code format is 'voucherId,userId'
+    const [voucherId, userId] = data.split(',');
+
+    if (voucherId && userId) {
+      const { error } = await supabase
+        .from('used_vouchers')
+        .insert({ vouchernumber: voucherId, user_id: userId, used_at: new Date() });
+
+      if (error) {
+        console.error('Error redeeming voucher:', error);
+        alert('Error redeeming voucher.');
+      } else {
+        alert('Voucher redeemed successfully!');
+      }
+    } else {
+      alert('Invalid QR code format.');
+    }
+  };
+
+  if (!cameraPermission) {
+    return <View />;
+  }
+
+  if (!cameraPermission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Button onPress={requestCameraPermission} title="Grant permission" />
+      </View>
+    );
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -91,9 +129,7 @@ const AdminDashboard = () => {
     );
   }
 
-  // Handle case where user profile or retailer is not found
   if (!userProfile) {
-    console.log('User profile not found:', userProfile);
     return (
       <SafeAreaView style={styles.safeArea}>
         <Text>No se encontró el perfil del usuario. Inténtalo de nuevo.</Text>
@@ -102,7 +138,6 @@ const AdminDashboard = () => {
   }
 
   if (!retailer) {
-    console.log('Retailer not found for user profile:', userProfile);
     return (
       <SafeAreaView style={styles.safeArea}>
         <Text>No se encontró el minorista. Inténtalo de nuevo.</Text>
@@ -120,9 +155,32 @@ const AdminDashboard = () => {
       <Text style={styles.retailer}>Minorista: {retailer.name}</Text>
       <Text style={styles.retailerId}>Retailer ID: {userProfile.retailer_id}</Text>
 
-      {/* Button to sign out */}
+      {/* QR Code Scanner */}
+      {!scanned && (
+        <CameraView
+          style={styles.camera}
+          facing={facing}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr'],
+          }}
+          onBarcodeScanned={!scanned ? handleBarcodeScanned : undefined} // Use the correct prop name
+        />
+      )}
+
+      {scanned && (
+        <Button title="Escanear otra vez" onPress={() => setScanned(false)} />
+      )}
+
       <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Cerrar sesión</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.torchButton}
+        onPress={() => setTorchEnabled((prev) => !prev)} // Toggle torch
+      >
+        <Text style={styles.torchButtonText}>
+          {torchEnabled ? 'Apagar Linterna' : 'Encender Linterna'}
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -158,13 +216,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
   },
+  camera: {
+    width: '100%',
+    height: 400,
+  },
   signOutButton: {
     backgroundColor: '#E70020',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginTop: 20,
   },
   signOutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  torchButton: {
+    backgroundColor: '#E70020',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  torchButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
