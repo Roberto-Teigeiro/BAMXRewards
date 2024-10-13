@@ -90,7 +90,23 @@ const AdminDashboard = () => {
 
     // Assuming the QR code format is 'voucherId,userId'
     const [voucherId, userId] = data.split(',');
+
+
     if (voucherId && userId) {
+
+      try{
+        const {data, error}= await supabase.from('products').select('retailer_id').eq('id', voucherId).single()
+        if(data?.retailer_id!=userProfile?.retailer_id){
+          alert("No tienes los permisos para canjear ese cupon.")
+          return
+        }
+      }catch(error){
+        console.log(error)
+        alert("Hubo un error en tu cupon")
+      }
+
+
+
       const { error } = await supabase
         .from('used_vouchers')
         .insert({ vouchernumber: voucherId, user_id: userId, used_at: new Date() });
