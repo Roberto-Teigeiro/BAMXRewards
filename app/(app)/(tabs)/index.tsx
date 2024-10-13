@@ -37,6 +37,7 @@ const images = {
 const App = () => {
   const [retailers, setRetailers] = useState<Retailer[]>([]);
   const [session, setSession] = useState(null);
+  const [admin,setAdmin]=useState(false)
   const router = useRouter(); // Initialize the router
 
   useEffect(() => {
@@ -94,7 +95,9 @@ const App = () => {
     }
 
     if (data) {
-      // You can add additional logic for other roles here if needed
+      if (data.role=='retailer_admin'){
+        setAdmin(true)
+      }
     }
   };
 
@@ -105,9 +108,10 @@ const App = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Button to navigate to admin */}
-      <TouchableOpacity style={styles.adminButton} onPress={handleAdminRedirect}>
+      {admin &&
+        <TouchableOpacity style={styles.adminButton} onPress={handleAdminRedirect}>
         <Text style={styles.adminButtonText}>Entra como administrador de tienda</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>}
 
       <FlatList
         ListHeaderComponent={<Text style={styles.title}>Nuestros Aliados</Text>}

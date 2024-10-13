@@ -90,7 +90,6 @@ const AdminDashboard = () => {
 
     // Assuming the QR code format is 'voucherId,userId'
     const [voucherId, userId] = data.split(',');
-
     if (voucherId && userId) {
       const { error } = await supabase
         .from('used_vouchers')
@@ -98,12 +97,12 @@ const AdminDashboard = () => {
 
       if (error) {
         console.error('Error redeeming voucher:', error);
-        alert('Error redeeming voucher.');
+        alert('Hubo un error canjeando el cupon.');
       } else {
-        alert('Voucher redeemed successfully!');
+        alert('Cupon canjeado correctamente!');
       }
     } else {
-      alert('Invalid QR code format.');
+      alert('QR Invalido');
     }
   };
 
@@ -113,12 +112,13 @@ const AdminDashboard = () => {
 
   if (!cameraPermission.granted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+      <View style={styles.permissionContainer}>
+        <Text style={styles.message}>Necesitamos permiso para acceder a tu cámara</Text>
         <Button onPress={requestCameraPermission} title="Grant permission" />
       </View>
     );
   }
+  
 
   if (loading) {
     return (
@@ -174,14 +174,6 @@ const AdminDashboard = () => {
       <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Cerrar sesión</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.torchButton}
-        onPress={() => setTorchEnabled((prev) => !prev)} // Toggle torch
-      >
-        <Text style={styles.torchButtonText}>
-          {torchEnabled ? 'Apagar Linterna' : 'Encender Linterna'}
-        </Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -215,6 +207,18 @@ const styles = StyleSheet.create({
   retailerId: {
     fontSize: 18,
     marginBottom: 20,
+  },
+  permissionContainer: {
+    flex: 1,
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center', // Center content horizontally
+    padding: 20, // Add some padding for better appearance
+    backgroundColor: '#fff', // Background color
+  },
+  message: {
+    fontSize: 18,
+    marginBottom: 20, // Space between message and button
+    textAlign: 'center', // Center text
   },
   camera: {
     width: '100%',

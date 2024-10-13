@@ -119,7 +119,7 @@ export default function Account() {
             <Text style={styles.label}>Nombre</Text>
             <Input
               placeholder="Nombre"
-              value={fullName || 'NA'}
+              value={fullName}
               onChangeText={(text) => setfullName(text)}
               style={styles.input}
             />
@@ -130,7 +130,7 @@ export default function Account() {
             <Text style={styles.label}>Usuario</Text>
             <Input
               placeholder="Nombre de usuario"
-              value={username || 'NA'}
+              value={username}
               onChangeText={(text) => setUsername(text)}
               style={styles.input}
             />
