@@ -15,7 +15,7 @@ const QRCodeComponent: React.FC<QRCodeComponentProps> = ({ visible, onClose, pro
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           
-          {/* Botón de retroceso */}
+          {/* Botón de retroceso con fondo amarillo */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>←</Text>
           </TouchableOpacity>
@@ -53,9 +53,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
+    backgroundColor: '#FFCC00', // Fondo amarillo
+    padding: 10, // Espaciado interno
+    borderRadius: 50, // Bordes redondeados
   },
   closeButtonText: {
     fontSize: 18,
+    color: 'black', // Color de texto negro para mejor contraste
   },
   descriptionText: {
     marginBottom: 20,
