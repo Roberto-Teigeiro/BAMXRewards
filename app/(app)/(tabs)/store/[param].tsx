@@ -1,6 +1,6 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Button, View, Alert, Text, FlatList } from 'react-native';
+import { Button, View, Alert, Text, FlatList, StyleSheet } from 'react-native';
 import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useSession } from '@/context';
@@ -46,12 +46,10 @@ export default function MyComponent() {
       setLoading(true);
       let retailerId: number | null = null;
 
-      // Primero, intentamos convertir el parámetro a un número
       const parsedId = parseInt(retailerParam, 10);
       if (!isNaN(parsedId)) {
         retailerId = parsedId;
       } else {
-        // Si no es un número, asumimos que es un nombre y buscamos el ID correspondiente
         const { data: retailers, error: retailerError } = await supabase
           .from('retailers')
           .select('id')
@@ -92,7 +90,6 @@ export default function MyComponent() {
     }
   };
 
-  // Objeto de mapeo para las imágenes de los productos
   const productImages: { [key: string]: any } = {
     'doritos.png': require('@/assets/images/doritos.png'),
     'pringles.png': require('@/assets/images/pringles.png'),
@@ -102,26 +99,26 @@ export default function MyComponent() {
     'favicon-scaled.png': require('@/assets/images/favicon-scaled.png'),
   };
 
-  // Suponiendo que quieres obtener el nombre de la tienda de los productos
   const storeName = param as string; 
 
   return (
-    <View>
+    <View style={styles.container}>
+      {/* Título agregado */}
+      <Text style={styles.title}>¡Explora las ofertas!</Text>
+
       {loading ? (
         <Text>Loading products...</Text>
-
       ) : products.length > 0 ? (
-        
         <FlatList
           data={products}
-          numColumns={2} 
-          keyExtractor={(item) => item.id.toString()} 
+          numColumns={2}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <StoreCard 
+            <StoreCard
               logo={productImages[item.logo_path] || require('@/assets/images/favicon-scaled.png')}
-              name={item.name} 
-              description={item.description} 
-              onPress={() => handleProductPress(item.id)} 
+              name={item.name}
+              description={item.description}
+              onPress={() => handleProductPress(item.id)}
             />
           )}
         />
@@ -142,3 +139,22 @@ export default function MyComponent() {
     </View>
   );
 }
+
+// Estilos
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff', // Fondo blanco para toda la página
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    marginTop: 50,
+    paddingHorizontal: 10,
+    color: '#E70020',
+    alignSelf: 'flex-start',
+  },
+});
+
