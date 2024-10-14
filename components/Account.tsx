@@ -165,7 +165,7 @@ export default function Account() {
             />
           </View>
 
-          {/* Ver historial de cupones */}
+          {/* Ver historial de cupones */}  
           <TouchableOpacity style={styles.linkContainer} onPress={() => handleHistoryRedirect()} >
             <Text style={styles.linkText}>Ver historial de cupones</Text>
           </TouchableOpacity>
