@@ -135,7 +135,6 @@ export default function MyComponent() {
         />
       )}
 
-      <Button title="Go to Store" onPress={() => console.log("Navigating to Store...")} />
     </View>
   );
 }

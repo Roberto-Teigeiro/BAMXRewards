@@ -5,10 +5,12 @@ import { Session } from '@supabase/supabase-js'
 import { Input } from './ui/input'
 import AvatarUploader from './AvatarUploader'
 import { useSession } from '@/context'
+import { useRouter } from 'expo-router'; 
 
 export default function Account() {
   const [session, setSession] = useState<Session | null>(null)
   const { signOut } = useSession();
+  const router = useRouter(); // Initialize the router
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -28,6 +30,11 @@ export default function Account() {
   useEffect(() => {
     if (session) getProfile()
   }, [session])
+
+  const handleHistoryRedirect = () => {
+    router.replace('/history'); // Redirect to the admin page when the button is pressed
+  };
+
 
   async function getProfile() {
     try {
@@ -159,7 +166,7 @@ export default function Account() {
           </View>
 
           {/* Ver historial de cupones */}
-          <TouchableOpacity style={styles.linkContainer}>
+          <TouchableOpacity style={styles.linkContainer} onPress={() => handleHistoryRedirect()} >
             <Text style={styles.linkText}>Ver historial de cupones</Text>
           </TouchableOpacity>
 
