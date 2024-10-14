@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { SafeAreaView, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { supabase } from '@/utils/supabase';
 import { Session } from '@supabase/supabase-js';
@@ -49,9 +49,16 @@ const VoucherHistory = () => {
     setLoading(false);
   };
 
+  // Función para restar 5 horas a la fecha original
+  const subtractFiveHours = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() - 6);
+    return date;
+  };
+
   const renderItem = ({ item }) => (
     <Text style={styles.voucherItem}>
-      Cupón: {item.vouchernumber} - Fecha: {new Date(item.used_at).toLocaleDateString()}
+      Cupón: {item.vouchernumber} - Fecha: {subtractFiveHours(item.used_at).toLocaleDateString()} {subtractFiveHours(item.used_at).toLocaleTimeString()}
     </Text>
   );
 
